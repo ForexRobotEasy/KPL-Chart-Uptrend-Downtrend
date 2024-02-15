@@ -1,0 +1,88 @@
+mql5
+//+------------------------------------------------------------------+
+//|                                              KPL Chart Uptrend Downtrend |
+//|                                                  forexroboteasy.com |
+//|                                                        Forex Robot Easy Team |
+//+------------------------------------------------------------------+
+
+// Define input parameters
+input int AlertFrequency = 1; // Alert frequency in minutes
+
+// Define global variables
+int trendColor = clrNONE; // Color variable for trend bars
+datetime lastAlertTime; // Variable to track last alert time
+
+//+------------------------------------------------------------------+
+//| Custom indicator initialization function                         |
+//+------------------------------------------------------------------+
+int OnInit()
+{
+    // Set indicator buffers
+    SetIndexBuffer(0, trendColor);
+
+    // Set indicator parameters
+    IndicatorSetInteger(INDICATOR_DIGITS, _Digits);
+    IndicatorSetString(INDICATOR_SHORTNAME, 'KPL Chart Uptrend Downtrend');
+
+    return(INIT_SUCCEEDED);
+}
+
+//+------------------------------------------------------------------+
+//| Custom indicator iteration function                              |
+//+------------------------------------------------------------------+
+int OnCalculate(const int rates_total,
+                const int prev_calculated,
+                const datetime &time[],
+                const double &open[],
+                const double &high[],
+                const double &low[],
+                const double &close[],
+                const long &tick_volume[],
+                const long &volume[],
+                const int &spread[])
+{
+    // Iterate through the bars
+    for(int i = prev_calculated; i < rates_total; i++)
+    {
+        // Identify uptrend and downtrend
+        if (IsUptrend(i))
+            trendColor = clrGreen;
+        else if (IsDowntrend(i))
+            trendColor = clrOrange;
+        else
+            trendColor = clrNONE;
+
+        // Update indicator buffers
+        IndicatorBuffers(1);
+        SetIndexStyle(0, DRAW_COLOR);
+        SetIndexBuffer(0, trendColor);
+
+        // Check if alert needs to be triggered
+        if (AlertFrequency > 0 && TimeCurrent() > lastAlertTime + AlertFrequency * 60)
+        {
+            // Trigger alert
+            Alert('Trend change detected at ', TimeToStr(TimeCurrent()));
+            lastAlertTime = TimeCurrent();
+        }
+    }
+
+    return(rates_total);
+}
+
+//+------------------------------------------------------------------+
+//| Function to check if uptrend is present                          |
+//+------------------------------------------------------------------+
+bool IsUptrend(const int index)
+{
+    // Add logic to check for uptrend
+    return true;
+}
+
+//+------------------------------------------------------------------+
+//| Function to check if downtrend is present                        |
+//+------------------------------------------------------------------+
+bool IsDowntrend(const int index)
+{
+    // Add logic to check for downtrend
+    return false;
+}
